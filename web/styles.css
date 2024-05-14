@@ -1,0 +1,71 @@
+:root {
+    --background-color: #f4f4f4;
+    --text-color: #333;
+    --header-bg-color: #333;
+    --header-text-color: #fff;
+    --main-bg-color: #fff;
+    --box-shadow-color: rgba(0, 0, 0, 0.1);
+    --border-color: #ccc;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-color: #121212;
+        --text-color: #bbb;
+        --header-bg-color: #222;
+        --header-text-color: #ddd;
+        --main-bg-color: #333;
+        --box-shadow-color: rgba(255, 255, 255, 0.1);
+        --border-color: #444;
+    }
+}
+
+/* basic reset */
+body, h1, h2, p, ul, li {
+    margin: 0;
+    padding: 0;
+    color: var(--text-color);
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    padding: 20px;
+    background-color: var(--background-color);
+}
+
+header {
+    background: var(--header-bg-color);
+    color: var(--header-text-color);
+    padding: 10px 0;
+    text-align: center;
+}
+
+main {
+    margin-top: 20px;
+}
+
+section {
+    background: var(--main-bg-color);
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px 0 var(--box-shadow-color);
+}
+
+h1, h2 {
+    color: inherit;
+}
+
+#laptime-list {
+    list-style-type: none;
+}
+
+#laptime-list li {
+    padding: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+#laptime-list li:last-child {
+    border-bottom: none;
+}
