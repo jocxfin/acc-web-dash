@@ -75,9 +75,9 @@ def servers():
 
 def refresh_token_periodically():
     login()
-    Timer(3600, refresh_token_periodically).start()
+    Timer(3600, refresh_token_periodically).start()  
 
 if __name__ == '__main__':
-    login()  # Initial login
+    login()  
     refresh_token_periodically()
     app.run(host='0.0.0.0', port=config_values['dash_port'])
