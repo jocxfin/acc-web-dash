@@ -1,12 +1,19 @@
 import requests
 import json
-from .config import get_config
+import os
+import sys
 
-config = get_config()
+if __name__ == "__main__" and (__package__ is None or __package__ == ''):
+    sys.path.append(os.path.dirname(sys.path[0]))
+    import config
+else:
+    from . import config
+
+config_values = config.get_config()
 
 # Construct URLs
-LOGIN_URL = f"http://{config['server_address']}:{config['server_port']}/api/login"
-TOKEN_URL = f"http://{config['server_address']}:{config['server_port']}/api/token"
+LOGIN_URL = f"http://{config_values['server_address']}:{config_values['server_port']}/api/login"
+TOKEN_URL = f"http://{config_values['server_address']}:{config_values['server_port']}/api/token"
 
 HEADERS = {
     'Accept': 'application/json, text/plain, */*',
@@ -15,7 +22,7 @@ HEADERS = {
 }
 
 def login():
-    login_data = json.dumps({'password': config['password']})
+    login_data = json.dumps({'password': config_values['password']})
     response = requests.post(LOGIN_URL, headers=HEADERS, data=login_data)
     response.raise_for_status()
     return response.json()['token']
