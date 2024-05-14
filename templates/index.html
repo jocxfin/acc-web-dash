@@ -4,13 +4,105 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ACC Server Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="static/styles.css">
+    <script>
+        async function fetchServers() {
+            try {
+                const response = await fetch('/api/servers');
+                const data = await response.json();
+                if (data.error) {
+                    console.error(data.error);
+                } else {
+                    populateServersDropdown(data);
+                }
+            } catch (error) {
+                console.error('Error fetching servers:', error);
+            }
+        }
+
+        function populateServersDropdown(servers) {
+            const serverSelect = document.getElementById('server-select');
+            serverSelect.innerHTML = '';
+
+            servers.forEach(server => {
+                if (server.isRunning) {
+                    const option = document.createElement('option');
+                    option.value = server.id;
+                    option.textContent = server.name;
+                    serverSelect.appendChild(option);
+                }
+            });
+
+            if (serverSelect.options.length > 0) {
+                fetchLiveInfo(serverSelect.value);
+            }
+        }
+
+        async function fetchLiveInfo(instanceId) {
+            try {
+                const response = await fetch(`/api/live-info/${instanceId}`);
+                const data = await response.json();
+                if (data.error) {
+                    console.error(data.error);
+                } else {
+                    displayLiveInfo(data);
+                }
+            } catch (error) {
+                console.error('Error fetching live info:', error);
+            }
+        }
+
+        function displayLiveInfo(data) {
+            const sessionDetails = document.getElementById('session-details');
+            const laptimeList = document.getElementById('laptime-list');
+            
+            sessionDetails.textContent = 'Session Details: ' + JSON.stringify(data);
+
+            // Clear the previous list
+            laptimeList.innerHTML = '';
+
+            if (data.cars) {
+                data.cars.forEach(car => {
+                    const driverName = car.currentDriver.name;
+                    const carNumber = car.raceNumber;
+                    const lap = car.currLap;
+                    const lastLapTime = car.lastLapMS;
+                    const bestLapTime = car.bestLapMS;
+
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `Driver: ${driverName}, Car#: ${carNumber}, Lap: ${lap}, Last lap: ${lastLapTime}, Best lap: ${bestLapTime}`;
+                    laptimeList.appendChild(listItem);
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const serverSelect = document.getElementById('server-select');
+            serverSelect.addEventListener('change', () => {
+                fetchLiveInfo(serverSelect.value);
+            });
+
+            fetchServers();
+            setInterval(() => {
+                fetchServers();
+                if (serverSelect.value) {
+                    fetchLiveInfo(serverSelect.value);
+                }
+            }, 5000);
+        });
+    </script>
 </head>
 <body>
     <header>
         <h1>ACC Server Dashboard</h1>
     </header>
     <main>
+        <section id="server-selection">
+            <h2>Select Server</h2>
+            <select id="server-select">
+                <option>Loading servers...</option>
+            </select>
+        </section>
         <section id="session-info">
             <h2>Session Information</h2>
             <p id="session-details">Loading session details...</p>

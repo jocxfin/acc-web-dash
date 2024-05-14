@@ -17,8 +17,5 @@ ENV DASH_PORT=9069
 # Make the port defined in DASH_PORT available to the world outside this container
 EXPOSE $DASH_PORT
 
-# Use an entrypoint script to handle variable substitution
-ENTRYPOINT ["sh", "-c"]
-
-# Run the Gunicorn server, replace DASH_PORT in the command line
-CMD ["gunicorn --bind 0.0.0.0:$DASH_PORT app.main:app"]
+# Run the Gunicorn server
+CMD ["gunicorn", "--bind", "0.0.0.0:9069", "main:app"]
