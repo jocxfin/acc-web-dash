@@ -65,6 +65,7 @@
         function displayLiveInfo(data) {
             const sessionDetails = document.getElementById('session-details');
             const laptimeTableBody = document.getElementById('laptime-table-body');
+            const summaryTableBody = document.getElementById('summary-table-body');
 
             const liveInfo = data.live;
             sessionDetails.innerHTML = `
@@ -77,6 +78,7 @@
             `;
 
             laptimeTableBody.innerHTML = '';
+            summaryTableBody.innerHTML = '';
 
             if (liveInfo.cars) {
                 for (const carID in liveInfo.cars) {
@@ -91,27 +93,42 @@
                                 row.innerHTML = `
                                     <td>${driverName}</td>
                                     <td>${carNumber}</td>
+                                    <td>${index + 1}</td>
                                     <td>${convertTime(lap.lapTimeMS)}</td>
-                                    <td>${convertTime(lap.s1)}</td>
-                                    <td>${convertTime(lap.s2)}</td>
-                                    <td>${convertTime(lap.s3)}</td>
-                                    <td>${convertTime(car.lastLapMS)}</td>
+                                    <td>${convertSegmentTime(lap.s1)}</td>
+                                    <td>${convertSegmentTime(lap.s2)}</td>
+                                    <td>${convertSegmentTime(lap.s3)}</td>
                                     <td>${convertTime(car.bestLapMS)}</td>
                                 `;
                             } else {
                                 row.innerHTML = `
                                     <td></td>
                                     <td>${carNumber}</td>
+                                    <td>${index + 1}</td>
                                     <td>${convertTime(lap.lapTimeMS)}</td>
-                                    <td>${convertTime(lap.s1)}</td>
-                                    <td>${convertTime(lap.s2)}</td>
-                                    <td>${convertTime(lap.s3)}</td>
-                                    <td>${convertTime(car.lastLapMS)}</td>
+                                    <td>${convertSegmentTime(lap.s1)}</td>
+                                    <td>${convertSegmentTime(lap.s2)}</td>
+                                    <td>${convertSegmentTime(lap.s3)}</td>
                                     <td>${convertTime(car.bestLapMS)}</td>
                                 `;
                             }
                             laptimeTableBody.appendChild(row);
                         });
+
+                        const bestLap = car.laps.reduce((best, lap) => {
+                            return lap.lapTimeMS < best.lapTimeMS ? lap : best;
+                        }, car.laps[0]);
+
+                        const summaryRow = document.createElement('tr');
+                        summaryRow.innerHTML = `
+                            <td>${driverName}</td>
+                            <td>${carNumber}</td>
+                            <td>${convertTime(bestLap.lapTimeMS)}</td>
+                            <td>${convertSegmentTime(bestLap.s1)}</td>
+                            <td>${convertSegmentTime(bestLap.s2)}</td>
+                            <td>${convertSegmentTime(bestLap.s3)}</td>
+                        `;
+                        summaryTableBody.appendChild(summaryRow);
                     } else {
                         const row = document.createElement('tr');
                         row.innerHTML = `
@@ -132,6 +149,14 @@
             const minutes = Math.floor(timeInMS / 60000);
             const seconds = ((timeInMS % 60000) / 1000).toFixed(3);
             return `${minutes}:${seconds.padStart(6, '0')}`;
+        }
+
+        function convertSegmentTime(segmentTime) {
+            if (segmentTime === "string") { // Handle default placeholder
+                return "N/A";
+            }
+            // Assuming segmentTime is already in the correct format (mm:ss.sss)
+            return segmentTime;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -174,16 +199,36 @@
                         <th>Driver</th>
                         <th>Car#</th>
                         <th>Lap</th>
+                        <th>Lap Time</th>
                         <th>S1</th>
                         <th>S2</th>
                         <th>S3</th>
-                        <th>Last lap</th>
                         <th>Best lap</th>
                     </tr>
                 </thead>
                 <tbody id="laptime-table-body">
                     <tr>
                         <td colspan="8">Loading lap times...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        <section id="summary">
+            <h2>Summary</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Driver</th>
+                        <th>Car#</th>
+                        <th>Best Lap</th>
+                        <th>S1</th>
+                        <th>S2</th>
+                        <th>S3</th>
+                    </tr>
+                </thead>
+                <tbody id="summary-table-body">
+                    <tr>
+                        <td colspan="6">Loading summary...</td>
                     </tr>
                 </tbody>
             </table>
